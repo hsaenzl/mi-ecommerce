@@ -1,0 +1,50 @@
+<article
+  class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 p-5 flex flex-col items-center text-center"
+>
+  <img
+    [src]="imagen()"
+    [alt]="nombre()"
+    class="w-full h-40 object-cover rounded-xl mb-4"
+  />
+
+  <h3 class="text-lg font-semibold text-slate-800" >{{ nombre() }}</h3>
+  <div class="flex justify-between gap-4">
+    <p class="text-slate-700 font-bold text-xl mt-1 mb-4"> {{ precio() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</p>
+
+    <p class="text-xs rounded-3xl p-4"
+      [class.bg-green-400]="stock() > 10"
+      [class.bg-amber-400]="stock() <= 10 &&  stock() > 0"
+      [class.bg-red-600]="stock() === 0"
+    >{{  stock() | stockAString  }}</p>
+  </div>
+
+  <div class="flex items-center gap-4 mb-5">
+    <button
+      type="button"
+      class="w-9 h-9 rounded-full bg-slate-200 text-slate-700 font-bold text-lg leading-none hover:bg-slate-300 transition-colors"
+      aria-label="Disminuir cantidad"
+      (click)="reducir()"
+    >
+      −
+    </button>
+
+    <span class="w-8 text-center font-semibold text-slate-800">{{ cantidad() }}</span>
+
+    <button
+      type="button"
+      class="w-9 h-9 rounded-full bg-slate-200 text-slate-700 font-bold text-lg leading-none hover:bg-slate-300 transition-colors"
+      aria-label="Aumentar cantidad"
+      (click)="incrementar()"
+    >
+      +
+    </button>
+  </div>
+
+  <button
+    type="button"
+    class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-medium hover:bg-slate-700 active:scale-95 transition-all duration-150"
+    (click)="agregarAlCarrito()"
+  >
+    Agregar al carrito
+  </button>
+</article>

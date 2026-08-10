@@ -1,0 +1,73 @@
+<div class="min-h-screen bg-slate-100 flex flex-col lg:flex-row">
+  <main class="flex-1 p-6 lg:p-10">
+    <header class="mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-3xl font-bold text-slate-800">🛍️ Tienda de Zapatillas</h1>
+            <app-header (buscar)="alBuscar($event)" />
+        </div>
+        <p class="text-slate-700 mt-4">Resultados para: <strong> {{ textoBuscado() }}</strong></p>
+    </header>
+
+    <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+      @for (producto of productos.filter(p => 
+        p.nombre.toLowerCase().includes(textoBuscado().toLowerCase())); track producto.id) {
+        <app-product-card
+          [id]="producto.id"
+          [nombre]="producto.nombre"
+          [precio]="producto.precio"
+          [imagen]="producto.imagen"
+          [stock]="producto.stock"
+          (addToCart)="manejarAgregarAlCarrito($event)"
+        />
+      }
+
+    </section>
+  </main>
+
+  <aside class="w-full lg:w-80 bg-slate-300 text-slate-900 p-6 lg:min-h-screen">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="text-3xl">🛒</span>
+      <h2 class="text-xl font-semibold">Tu Carrito</h2>
+
+      <span
+        class="ml-auto inline-flex items-center justify-center min-w-7 h-7 px-2 rounded-full bg-emerald-500 text-slate-900 font-bold text-sm transition-transform duration-300 scale-100"
+      >
+        {{ calcularCantidadArticulos() }}
+      </span>
+    </div>
+
+    <div class="space-y-3 mb-6">
+      @for( productoCarrito of elementosCarrito; track $index ){
+        <div class="flex items-center gap-3 bg-slate-200 rounded-xl p-3">
+          <img
+            [src]="productoCarrito.imagen"
+            [alt]="productoCarrito.nombre"
+            alt="Producto"
+            class="w-14 h-14 object-cover rounded-lg"
+          />
+
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-black truncate">{{ productoCarrito.nombre }}</p>
+            <p class="text-xs text-slate-800"> {{productoCarrito.precio | currency:'PEN':'symbol':'1.2-2':'es-PE'}} x {{ productoCarrito.cantidad }}</p>
+          </div>
+
+          <span class="text-sm font-semibold text-slate-900"> {{ productoCarrito.precio * productoCarrito.cantidad | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+        </div>
+      } @empty {
+        <p>Tu carrito esta vacio</p>
+      }
+    </div>
+
+    <div class="space-y-3">
+      <div class="flex justify-between text-sm text-slate-900">
+        <span>Total de items</span>
+        <span class="font-medium text-black">{{ calcularCantidad() }}</span>
+      </div>
+
+      <div class="flex justify-between text-sm text-slate-900">
+        <span>Total a pagar</span>
+        <span class="font-semibold text-black">{{ calcularPrecioTotal() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+      </div>
+    </div>
+  </aside>
+</div>
