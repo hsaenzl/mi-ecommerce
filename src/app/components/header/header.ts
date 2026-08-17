@@ -13,6 +13,7 @@ export class Header {
   alEscribir(evento: Event) {
     const input = evento.target as HTMLInputElement;
     this.texto.set(input.value);
+    this.buscar.emit(this.texto());
   }
 
   alBuscar() {

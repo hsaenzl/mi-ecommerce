@@ -1,3 +1,50 @@
-<!--<app-header />-->
-<app-lista-productos/>
+<!--<app-lista-productos/>
+<app-footer />-->
+<nav class="flex items-center justify-center gap-3 bg-slate-100 p-4">
+  <button
+    type="button"
+    class="px-4 py-2 rounded-lg font-medium transition-colors"
+    [class.bg-slate-900]="vistaActual() === 'catalogo'"
+    [class.text-white]="vistaActual() === 'catalogo'"
+    [class.text-slate-900]="vistaActual() !== 'catalogo'"
+    (click)="cambiarVista('catalogo')"
+  >
+    Catálogo
+  </button>
+
+  <button
+    type="button"
+    class="px-4 py-2 rounded-lg font-medium transition-colors"
+    [class.bg-slate-900]="vistaActual() === 'login'"
+    [class.text-white]="vistaActual() === 'login'"
+    [class.text-slate-900]="vistaActual() !== 'login'"
+    (click)="cambiarVista('login')"
+  >
+    Iniciar sesión
+  </button>
+
+  <button
+    type="button"
+    class="px-4 py-2 rounded-lg font-medium transition-colors"
+    [class.bg-slate-900]="vistaActual() === 'registro'"
+    [class.text-white]="vistaActual() === 'registro'"
+    [class.text-slate-900]="vistaActual() !== 'registro'"
+    (click)="cambiarVista('registro')"
+  >
+    Registrarse
+  </button>
+</nav>
+
+@switch (vistaActual()) {
+  @case ('login') {
+    <app-login />
+  }
+  @case ('registro') {
+    <app-registro />
+  }
+  @default {
+    <app-lista-productos />
+  }
+}
+
 <app-footer />

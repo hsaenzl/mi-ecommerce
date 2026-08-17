@@ -1,4 +1,4 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, computed, Input, signal } from '@angular/core';
 import { ProductCard } from '../product-card/product-card';
 import { IProductoCarrito, IProductoTienda } from '../../product.interface';
 import { CurrencyPipe } from '@angular/common';
@@ -13,9 +13,10 @@ import { Header } from '../header/header';
 export class ListaProductos {
 	textoBuscado = signal<string>('');
   	
-	elementosCarrito: IProductoCarrito[] = [];
-
-	productos: IProductoTienda[] = [
+	elementosCarrito = signal<IProductoCarrito[]>([]);
+	favoritos = signal<IProductoTienda[]>([]);
+	
+	productos = signal<IProductoTienda[]>([
 		{	id: 1,
 			nombre: 'Zapatillas Climacool con Pasadores',
 			imagen: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/3829d2b79d7941509635be64bdf191f0_9366/ZAPATILLAS_CLIMACOOL_CON_PASADORES_Blanco_KJ8969_01_00_standard.jpg',
@@ -82,17 +83,22 @@ export class ListaProductos {
 			precio: 1099,
 			stock: 10
 		}
-	];
+	]);
+
+  productosFiltrados = computed(() => {
+    const texto = this.textoBuscado().toLowerCase();
+    return this.productos().filter(p => p.nombre.toLowerCase().includes(texto));
+  });
 
   manejarAgregarAlCarrito(data: IProductoCarrito) {
-    const existeEnCarrito = this.elementosCarrito.find(p => p.id === data.id);
+    const existeEnCarrito = this.elementosCarrito().find(p => p.id === data.id);
 
     if (existeEnCarrito) {
       alert(`El producto "${data.nombre}" ya está en el carrito.`);
       return;
     }
 
-    const productoStock = this.productos.find(p => p.id === data.id);
+    const productoStock = this.productos().find(p => p.id === data.id);
     
     if (productoStock && data.cantidad > productoStock.stock) {
       let textoError = ` `;
@@ -105,30 +111,53 @@ export class ListaProductos {
       return;
     }
 
-    this.elementosCarrito.push(data)
+    this.elementosCarrito.update((listaActual) => {
+      return [...listaActual, data]
+    });
   }
 
-  calcularCantidad(){
-    let cantidadTotal = 0
-    for(let index = 0; index < this.elementosCarrito.length; index++){
-      cantidadTotal += this.elementosCarrito[index].cantidad
+  manejarToggleFavorito(producto: IProductoTienda) {
+    const index = this.favoritos().findIndex(p => p.id === producto.id);
+    if (index === -1) {
+		this.favoritos.update((listaActual) => {
+			return [...listaActual, producto];
+		});
+    } else {
+		this.favoritos.update((listaActual) => {
+			return listaActual.filter((_, i) => i !== index);
+		});
     }
-    return cantidadTotal
   }
 
-  calcularPrecioTotal(){
-    let precioTotal = 0
-    for(let index = 0; index < this.elementosCarrito.length; index++){
-      precioTotal += (this.elementosCarrito[index].cantidad * this.elementosCarrito[index].precio)
+  esFavorito(id: number): boolean {
+    return this.favoritos().some(p => p.id === id);
+  }
+
+  cantidadDeItems = computed<number>(() => {
+	let cantidadTotal = 0;
+    for(let index = 0; index < this.elementosCarrito().length; index++) {
+      cantidadTotal += this.elementosCarrito()[index].cantidad;
     }
-    return precioTotal
-  }
+    return cantidadTotal;
+  });
 
-  calcularCantidadArticulos() {
-    return this.elementosCarrito.length;
-  }
-
+  precioTotal = computed<number>(() => {
+	let precioTotal = 0;
+    for(let index = 0; index < this.elementosCarrito().length; index++){
+      precioTotal += (this.elementosCarrito()[index].cantidad * this.elementosCarrito()[index].precio)
+    }
+    return precioTotal;
+  });
+  
+  calcularCantidadArticulos = computed<number>(() => {
+	return this.elementosCarrito().length;
+  });
+  
+  calcularCantidadArticulosMeGusta = computed<number>(() => {
+	return this.favoritos().length;
+  });
+  
   alBuscar(texto: string) {
     this.textoBuscado.set(texto);
-  }  
+  }
 }

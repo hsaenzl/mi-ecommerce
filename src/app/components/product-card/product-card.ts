@@ -1,5 +1,5 @@
 import { Component, input, Input, model, output } from '@angular/core';
-import { IProductoCarrito } from '../../product.interface';
+import { IProductoCarrito, IProductoTienda } from '../../product.interface';
 import { EstadoStockPipe } from '../../models/estado-stock-pipe';
 import { CurrencyPipe } from '@angular/common';
 
@@ -11,15 +11,17 @@ import { CurrencyPipe } from '@angular/common';
 })
 
 export class ProductCard {
-  id = input.required<number>()
-  nombre = input.required<string>()
-  precio = input.required<number>()
-  imagen = input.required<string>()
-  stock = input.required<number>()
+  id = input.required<number>();
+  nombre = input.required<string>();
+  precio = input.required<number>();
+  imagen = input.required<string>();
+  stock = input.required<number>();
+  esFavorito = input<boolean>(false);
 
-  cantidad = model<number>(1)
+  cantidad = model<number>(1);
 
-  addToCart = output<IProductoCarrito>()
+  addToCart = output<IProductoCarrito>();
+  toggleFavorito = output<IProductoTienda>();
 
   incrementar() {
     this.cantidad.update((valorActual) => {
@@ -43,6 +45,16 @@ export class ProductCard {
       nombre: this.nombre(),
       cantidad: this.cantidad(),
       imagen: this.imagen()
+    });
+  }
+
+  alternarFavorito() {
+    this.toggleFavorito.emit({
+      id: this.id(),
+      nombre: this.nombre(),
+      precio: this.precio(),
+      imagen: this.imagen(),
+      stock: this.stock()
     });
   }
 }

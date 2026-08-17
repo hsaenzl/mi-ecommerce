@@ -9,18 +9,46 @@
     </header>
 
     <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-      @for (producto of productos.filter(p => 
-        p.nombre.toLowerCase().includes(textoBuscado().toLowerCase())); track producto.id) {
+      @for (producto of productosFiltrados(); track producto.id) {
         <app-product-card
           [id]="producto.id"
           [nombre]="producto.nombre"
           [precio]="producto.precio"
           [imagen]="producto.imagen"
           [stock]="producto.stock"
+          [esFavorito]="esFavorito(producto.id)"
           (addToCart)="manejarAgregarAlCarrito($event)"
+          (toggleFavorito)="manejarToggleFavorito($event)"
         />
+      } @empty {
+        <p class="text-slate-600">No se encontraron productos.</p>
       }
+    </section>
 
+    <section class="mt-12">
+      <h2 class="text-2xl font-bold text-slate-800 mb-6">❤️ Tus favoritos
+        <span
+          class="ml-auto inline-flex items-center justify-center min-w-7 h-7 px-2 rounded-full bg-red-500 text-slate-100 font-bold text-sm transition-transform duration-300 scale-100"
+        >{{ calcularCantidadArticulosMeGusta() }}
+      </span>
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        @for (producto of favoritos(); track producto.id) {
+          <app-product-card
+            [id]="producto.id"
+            [nombre]="producto.nombre"
+            [precio]="producto.precio"
+            [imagen]="producto.imagen"
+            [stock]="producto.stock"
+            [esFavorito]="true"
+            (addToCart)="manejarAgregarAlCarrito($event)"
+            (toggleFavorito)="manejarToggleFavorito($event)"
+          />
+        } @empty {
+          <p class="text-slate-600">Todavía no marcaste productos como favoritos.</p>
+        }
+      </div>
     </section>
   </main>
 
@@ -37,7 +65,7 @@
     </div>
 
     <div class="space-y-3 mb-6">
-      @for( productoCarrito of elementosCarrito; track $index ){
+      @for( productoCarrito of elementosCarrito(); track $index ){
         <div class="flex items-center gap-3 bg-slate-200 rounded-xl p-3">
           <img
             [src]="productoCarrito.imagen"
@@ -61,12 +89,12 @@
     <div class="space-y-3">
       <div class="flex justify-between text-sm text-slate-900">
         <span>Total de items</span>
-        <span class="font-medium text-black">{{ calcularCantidad() }}</span>
+        <span class="font-medium text-black">{{ cantidadDeItems() }}</span>
       </div>
 
       <div class="flex justify-between text-sm text-slate-900">
         <span>Total a pagar</span>
-        <span class="font-semibold text-black">{{ calcularPrecioTotal() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+        <span class="font-semibold text-black">{{ precioTotal() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
       </div>
     </div>
   </aside>
