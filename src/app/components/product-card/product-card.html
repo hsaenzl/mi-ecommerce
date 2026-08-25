@@ -13,14 +13,14 @@
   </button>
   
   <img
-    [src]="imagen()"
-    [alt]="nombre()"
+    [src]="image()"
+    [alt]="name()"
     class="w-full h-40 object-cover rounded-xl mb-4"
   />
 
-  <h3 class="text-lg font-semibold text-slate-800" >{{ nombre() }}</h3>
+  <h3 class="text-lg font-semibold text-slate-800" >{{ name() }}</h3>
   <div class="flex justify-between gap-4">
-    <p class="text-slate-700 font-bold text-xl mt-1 mb-4"> {{ precio() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</p>
+    <p class="text-slate-700 font-bold text-xl mt-1 mb-4"> {{ price() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</p>
 
     <p class="text-xs rounded-3xl p-4"
       [class.bg-green-400]="stock() > 10"
@@ -39,7 +39,7 @@
       −
     </button>
 
-    <span class="w-8 text-center font-semibold text-slate-800">{{ cantidad() }}</span>
+    <span class="w-8 text-center font-semibold text-slate-800">{{ amount() }}</span>
 
     <button
       type="button"

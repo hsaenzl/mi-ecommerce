@@ -1,6 +1,6 @@
 <!--<app-lista-productos/>
 <app-footer />-->
-<nav class="flex items-center justify-center gap-3 bg-slate-100 p-4">
+<nav class="flex items-center left-center gap-3 bg-slate-100 p-4">
   <button
     type="button"
     class="px-4 py-2 rounded-lg font-medium transition-colors"
@@ -15,15 +15,15 @@
   <button
     type="button"
     class="px-4 py-2 rounded-lg font-medium transition-colors"
-    [class.bg-slate-900]="vistaActual() === 'login'"
-    [class.text-white]="vistaActual() === 'login'"
-    [class.text-slate-900]="vistaActual() !== 'login'"
-    (click)="cambiarVista('login')"
+    [class.bg-slate-900]="modalLoginAbierto()"
+    [class.text-white]="modalLoginAbierto()"
+    [class.text-slate-900]="!modalLoginAbierto()"
+    (click)="abrirModalLogin()"
   >
     Iniciar sesión
   </button>
 
-  <button
+  <!--<button
     type="button"
     class="px-4 py-2 rounded-lg font-medium transition-colors"
     [class.bg-slate-900]="vistaActual() === 'registro'"
@@ -32,13 +32,10 @@
     (click)="cambiarVista('registro')"
   >
     Registrarse
-  </button>
+  </button>-->
 </nav>
 
 @switch (vistaActual()) {
-  @case ('login') {
-    <app-login />
-  }
   @case ('registro') {
     <app-registro />
   }
@@ -48,3 +45,23 @@
 }
 
 <app-footer />
+
+@if (modalLoginAbierto()) {
+  <div
+    class="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4"
+    (click)="cerrarModalLogin()"
+  >
+    <div class="relative w-full max-w-sm" (click)="$event.stopPropagation()">
+      <button
+        type="button"
+        class="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center text-lg font-bold text-slate-700 hover:bg-slate-100"
+        aria-label="Cerrar"
+        (click)="cerrarModalLogin()"
+      >
+        ×
+      </button>
+
+      <app-login (irARegistro)="irARegistroDesdeModal()" />
+    </div>
+  </div>
+}

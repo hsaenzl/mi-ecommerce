@@ -1,8 +1,9 @@
-import { Component, computed, Input, signal } from '@angular/core';
+import { Component, computed, inject, Input, signal } from '@angular/core';
 import { ProductCard } from '../product-card/product-card';
-import { IProductoCarrito, IProductoTienda } from '../../product.interface';
 import { CurrencyPipe } from '@angular/common';
 import { Header } from '../header/header';
+import { IProductoCarrito, IProductoTienda } from '../../interfaces/product.interface';
+import { ProductService } from '../../services/product-service';
 
 @Component({
   selector: 'app-lista-productos',
@@ -11,12 +12,22 @@ import { Header } from '../header/header';
   styleUrl: './lista-productos.css',
 })
 export class ListaProductos {
+	ngOnInit(): void {
+		this.listarProductos();
+	}
+
+	productService = inject(ProductService);
+
 	textoBuscado = signal<string>('');
   	
 	elementosCarrito = signal<IProductoCarrito[]>([]);
 	favoritos = signal<IProductoTienda[]>([]);
+
+	cargando = signal(false);
+
+	productos = signal<IProductoTienda[]>([]);
 	
-	productos = signal<IProductoTienda[]>([
+	/*productos = signal<IProductoTienda[]>([
 		{	id: 1,
 			nombre: 'Zapatillas Climacool con Pasadores',
 			imagen: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/3829d2b79d7941509635be64bdf191f0_9366/ZAPATILLAS_CLIMACOOL_CON_PASADORES_Blanco_KJ8969_01_00_standard.jpg',
@@ -83,31 +94,47 @@ export class ListaProductos {
 			precio: 1099,
 			stock: 10
 		}
-	]);
+	]);*/
 
-  productosFiltrados = computed(() => {
-    const texto = this.textoBuscado().toLowerCase();
-    return this.productos().filter(p => p.nombre.toLowerCase().includes(texto));
-  });
+	listarProductos() {
+		this.cargando.set(true);
+
+		this.productService.listarProductos().subscribe({
+			next: (datos) => {
+				this.productos.set(datos)
+			},
+			error: () => {
+				console.error('ocurrio un error');
+			},
+			complete: () => {
+				this.cargando.set(false)
+			}
+    	});
+  	}
+
+	productosFiltrados = computed(() => {
+		const texto = this.textoBuscado().toLowerCase();
+		return this.productos().filter(p => p.name.toLowerCase().includes(texto));
+	});
 
   manejarAgregarAlCarrito(data: IProductoCarrito) {
     const existeEnCarrito = this.elementosCarrito().find(p => p.id === data.id);
 
     if (existeEnCarrito) {
-      alert(`El producto "${data.nombre}" ya está en el carrito.`);
+      alert(`El producto "${data.name}" ya está en el carrito.`);
       return;
     }
 
     const productoStock = this.productos().find(p => p.id === data.id);
     
-    if (productoStock && data.cantidad > productoStock.stock) {
+    if (productoStock && data.amount > productoStock.stock) {
       let textoError = ` `;
       if (productoStock.stock === 0) {
         textoError = `No hay stock disponible.`;
       } else {
         textoError = `Solo hay ${productoStock.stock} en stock.`;
       }
-      alert(`No puedes agregar ${data.cantidad} unidades de "${data.nombre}". ${textoError}`);
+      alert(`No puedes agregar ${data.amount} unidades de "${data.name}". ${textoError}`);
       return;
     }
 
@@ -136,7 +163,7 @@ export class ListaProductos {
   cantidadDeItems = computed<number>(() => {
 	let cantidadTotal = 0;
     for(let index = 0; index < this.elementosCarrito().length; index++) {
-      cantidadTotal += this.elementosCarrito()[index].cantidad;
+      cantidadTotal += this.elementosCarrito()[index].amount;
     }
     return cantidadTotal;
   });
@@ -144,7 +171,7 @@ export class ListaProductos {
   precioTotal = computed<number>(() => {
 	let precioTotal = 0;
     for(let index = 0; index < this.elementosCarrito().length; index++){
-      precioTotal += (this.elementosCarrito()[index].cantidad * this.elementosCarrito()[index].precio)
+      precioTotal += (this.elementosCarrito()[index].amount * this.elementosCarrito()[index].price);
     }
     return precioTotal;
   });

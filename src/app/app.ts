@@ -4,7 +4,7 @@ import { Footer } from './components/footer/footer';
 import { Login } from './components/login/login';
 import { Registro } from './components/registro/registro';
 
-type Vista = 'catalogo' | 'login' | 'registro';
+type Vista = 'catalogo' | 'registro';
 
 @Component({
   selector: 'app-root',
@@ -15,9 +15,23 @@ type Vista = 'catalogo' | 'login' | 'registro';
 export class App {
 
   vistaActual = signal<Vista>('catalogo');
+  modalLoginAbierto = signal(false);
 
   cambiarVista(vista: Vista) {
     this.vistaActual.set(vista);
+  }
+
+  abrirModalLogin() {
+    this.modalLoginAbierto.set(true);
+  }
+
+  cerrarModalLogin() {
+    this.modalLoginAbierto.set(false);
+  }
+
+  irARegistroDesdeModal() {
+    this.modalLoginAbierto.set(false);
+    this.cambiarVista('registro');
   }
     
 }

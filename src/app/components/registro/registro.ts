@@ -1,4 +1,6 @@
-import { Component, model, signal } from '@angular/core';
+import { Component, inject, model, signal } from '@angular/core';
+import { UserService } from '../../services/user-service';
+import { IUsers } from '../../interfaces/user.interface';
 
 @Component({
   selector: 'app-registro',
@@ -16,6 +18,10 @@ export class Registro {
   emailInvalido = signal<boolean>(false);
   passwordInvalido = signal<boolean>(false);
   confirmarPasswordInvalido = signal<boolean>(false);
+
+  cargando = signal(false);
+
+  userServices = inject(UserService);
 
   alEscribirNombre(evento: Event) {
     const input = evento.target as HTMLInputElement;
@@ -37,7 +43,7 @@ export class Registro {
     this.confirmarPassword.set(input.value);
   }
 
-  registrarse() {
+  async registrarse() {
     const nombreVacio = this.nombre().trim() === '';
     const emailVacio = this.email().trim() === '';
     const passwordVacio = this.password().trim() === '';
@@ -65,6 +71,26 @@ export class Registro {
       email: this.email(),
       password: this.password(),
       confirmarPassword: this.confirmarPassword(),
+    });
+
+    const nuevoUsuario: Omit<IUsers, 'id'> = {
+      nombres: this.nombre(),
+      email: this.email(),
+      contrasena: this.password(),
+      tipo_usuario: 'normal'
+    };
+
+    this.userServices.crearUsuario(nuevoUsuario).subscribe({
+      next: (respuesta) => {
+        console.log('Usuario creado:', respuesta);
+        alert('Usuario creado');
+        this.cargando.set(false);
+      },
+      error: (err) => {
+        console.error('Error al crear usuario:', err);
+        alert('Error al crear usuario');
+        this.cargando.set(false);
+      }
     });
   }
 }

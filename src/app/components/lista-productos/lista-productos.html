@@ -1,3 +1,14 @@
+@if(cargando()){
+  <div
+  class="fixed inset-0 z-50 flex-col items-center justify-center gap-3 bg-slate-900/50 backdrop-blur-sm flex align-middle"
+  >
+    <div>
+      <div class="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-white"></div>
+      <p class="text-sm font-medium text-white">Cargando...</p>
+    </div>
+  </div>
+}
+
 <div class="min-h-screen bg-slate-100 flex flex-col lg:flex-row">
   <main class="flex-1 p-6 lg:p-10">
     <header class="mb-8">
@@ -12,9 +23,9 @@
       @for (producto of productosFiltrados(); track producto.id) {
         <app-product-card
           [id]="producto.id"
-          [nombre]="producto.nombre"
-          [precio]="producto.precio"
-          [imagen]="producto.imagen"
+          [name]="producto.name"
+          [price]="producto.price"
+          [image]="producto.image"
           [stock]="producto.stock"
           [esFavorito]="esFavorito(producto.id)"
           (addToCart)="manejarAgregarAlCarrito($event)"
@@ -37,9 +48,9 @@
         @for (producto of favoritos(); track producto.id) {
           <app-product-card
             [id]="producto.id"
-            [nombre]="producto.nombre"
-            [precio]="producto.precio"
-            [imagen]="producto.imagen"
+            [name]="producto.name"
+            [price]="producto.price"
+            [image]="producto.image"
             [stock]="producto.stock"
             [esFavorito]="true"
             (addToCart)="manejarAgregarAlCarrito($event)"
@@ -68,18 +79,18 @@
       @for( productoCarrito of elementosCarrito(); track $index ){
         <div class="flex items-center gap-3 bg-slate-200 rounded-xl p-3">
           <img
-            [src]="productoCarrito.imagen"
-            [alt]="productoCarrito.nombre"
+            [src]="productoCarrito.image"
+            [alt]="productoCarrito.name"
             alt="Producto"
             class="w-14 h-14 object-cover rounded-lg"
           />
 
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-black truncate">{{ productoCarrito.nombre }}</p>
-            <p class="text-xs text-slate-800"> {{productoCarrito.precio | currency:'PEN':'symbol':'1.2-2':'es-PE'}} x {{ productoCarrito.cantidad }}</p>
+            <p class="text-sm font-medium text-black truncate">{{ productoCarrito.name }}</p>
+            <p class="text-xs text-slate-800"> {{productoCarrito.price | currency:'PEN':'symbol':'1.2-2':'es-PE'}} x {{ productoCarrito.amount }}</p>
           </div>
 
-          <span class="text-sm font-semibold text-slate-900"> {{ productoCarrito.precio * productoCarrito.cantidad | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+          <span class="text-sm font-semibold text-slate-900"> {{ productoCarrito.price * productoCarrito.amount | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
         </div>
       } @empty {
         <p>Tu carrito esta vacio</p>
