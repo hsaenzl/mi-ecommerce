@@ -1,4 +1,4 @@
-import { Component, inject, model, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { UserService } from '../../services/user-service';
 import { IUsers } from '../../interfaces/user.interface';
 
@@ -9,10 +9,10 @@ import { IUsers } from '../../interfaces/user.interface';
   styleUrl: './registro.css',
 })
 export class Registro {
-  nombre = model<string>('');
-  email = model<string>('');
-  password = model<string>('');
-  confirmarPassword = model<string>('');
+  nombre = signal<string>('');
+  email = signal<string>('');
+  password = signal<string>('');
+  confirmarPassword = signal<string>('');
 
   nombreInvalido = signal<boolean>(false);
   emailInvalido = signal<boolean>(false);

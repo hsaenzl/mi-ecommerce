@@ -1,4 +1,4 @@
-@if(cargando()){
+@if(productService.cargando()){
   <div
   class="fixed inset-0 z-50 flex-col items-center justify-center gap-3 bg-slate-900/50 backdrop-blur-sm flex align-middle"
   >
@@ -9,8 +9,8 @@
   </div>
 }
 
-<div class="min-h-screen bg-slate-100 flex flex-col lg:flex-row">
-  <main class="flex-1 p-6 lg:p-10">
+<div class="min-h-screen bg-slate-100">
+  <div class="p-6 lg:p-10">
     <header class="mb-8">
         <div class="flex items-center justify-between mb-6">
             <h1 class="text-3xl font-bold text-slate-800">🛍️ Tienda de Zapatillas</h1>
@@ -19,22 +19,35 @@
         <p class="text-slate-700 mt-4">Resultados para: <strong> {{ textoBuscado() }}</strong></p>
     </header>
 
-    <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-      @for (producto of productosFiltrados(); track producto.id) {
-        <app-product-card
-          [id]="producto.id"
-          [name]="producto.name"
-          [price]="producto.price"
-          [image]="producto.image"
-          [stock]="producto.stock"
-          [esFavorito]="esFavorito(producto.id)"
-          (addToCart)="manejarAgregarAlCarrito($event)"
-          (toggleFavorito)="manejarToggleFavorito($event)"
-        />
-      } @empty {
-        <p class="text-slate-600">No se encontraron productos.</p>
-      }
-    </section>
+    @if (productService.error()) {
+      <div class="rounded-2xl bg-red-50 border border-red-200 text-red-700 p-6 text-center">
+        <p class="font-medium">{{ productService.error() }}</p>
+        <button
+          type="button"
+          class="mt-3 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors"
+          (click)="productService.cargarProductos()"
+        >
+          Reintentar
+        </button>
+      </div>
+    } @else {
+      <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        @for (producto of productosFiltrados(); track producto.id) {
+          <app-product-card
+            [id]="producto.id"
+            [name]="producto.name"
+            [price]="producto.price"
+            [image]="producto.image"
+            [stock]="producto.stock"
+            [esFavorito]="esFavorito(producto.id)"
+            (addToCart)="manejarAgregarAlCarrito($event)"
+            (toggleFavorito)="manejarToggleFavorito($event)"
+          />
+        } @empty {
+          <p class="text-slate-600">No se encontraron productos.</p>
+        }
+      </section>
+    }
 
     <section class="mt-12">
       <h2 class="text-2xl font-bold text-slate-800 mb-6">❤️ Tus favoritos
@@ -61,52 +74,5 @@
         }
       </div>
     </section>
-  </main>
-
-  <aside class="w-full lg:w-80 bg-slate-300 text-slate-900 p-6 lg:min-h-screen">
-    <div class="flex items-center gap-3 mb-6">
-      <span class="text-3xl">🛒</span>
-      <h2 class="text-xl font-semibold">Tu Carrito</h2>
-
-      <span
-        class="ml-auto inline-flex items-center justify-center min-w-7 h-7 px-2 rounded-full bg-emerald-500 text-slate-900 font-bold text-sm transition-transform duration-300 scale-100"
-      >
-        {{ calcularCantidadArticulos() }}
-      </span>
-    </div>
-
-    <div class="space-y-3 mb-6">
-      @for( productoCarrito of elementosCarrito(); track $index ){
-        <div class="flex items-center gap-3 bg-slate-200 rounded-xl p-3">
-          <img
-            [src]="productoCarrito.image"
-            [alt]="productoCarrito.name"
-            alt="Producto"
-            class="w-14 h-14 object-cover rounded-lg"
-          />
-
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-black truncate">{{ productoCarrito.name }}</p>
-            <p class="text-xs text-slate-800"> {{productoCarrito.price | currency:'PEN':'symbol':'1.2-2':'es-PE'}} x {{ productoCarrito.amount }}</p>
-          </div>
-
-          <span class="text-sm font-semibold text-slate-900"> {{ productoCarrito.price * productoCarrito.amount | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
-        </div>
-      } @empty {
-        <p>Tu carrito esta vacio</p>
-      }
-    </div>
-
-    <div class="space-y-3">
-      <div class="flex justify-between text-sm text-slate-900">
-        <span>Total de items</span>
-        <span class="font-medium text-black">{{ cantidadDeItems() }}</span>
-      </div>
-
-      <div class="flex justify-between text-sm text-slate-900">
-        <span>Total a pagar</span>
-        <span class="font-semibold text-black">{{ precioTotal() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
-      </div>
-    </div>
-  </aside>
+  </div>
 </div>

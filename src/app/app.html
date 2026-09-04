@@ -1,16 +1,33 @@
-<!--<app-lista-productos/>
-<app-footer />-->
-<nav class="flex items-center left-center gap-3 bg-slate-100 p-4">
-  <button
-    type="button"
-    class="px-4 py-2 rounded-lg font-medium transition-colors"
-    [class.bg-slate-900]="vistaActual() === 'catalogo'"
-    [class.text-white]="vistaActual() === 'catalogo'"
-    [class.text-slate-900]="vistaActual() !== 'catalogo'"
-    (click)="cambiarVista('catalogo')"
+<nav class="flex flex-wrap items-center justify-center gap-3 bg-slate-100 p-4">
+  <a
+    routerLink="/"
+    routerLinkActive="bg-slate-900 text-white"
+    [routerLinkActiveOptions]="{ exact: true }"
+    class="px-4 py-2 rounded-lg font-medium text-slate-900 transition-colors"
+  >
+    Inicio
+  </a>
+
+  <a
+    routerLink="/catalogo"
+    routerLinkActive="bg-slate-900 text-white"
+    class="px-4 py-2 rounded-lg font-medium text-slate-900 transition-colors"
   >
     Catálogo
-  </button>
+  </a>
+
+  <a
+    routerLink="/carrito"
+    routerLinkActive="bg-slate-900 text-white"
+    class="px-4 py-2 rounded-lg font-medium text-slate-900 transition-colors"
+  >
+    Carrito
+    @if (cartService.calcularCantidadArticulos() > 0) {
+      <span class="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-emerald-500 text-slate-900 font-bold text-xs">
+        {{ cartService.calcularCantidadArticulos() }}
+      </span>
+    }
+  </a>
 
   <button
     type="button"
@@ -23,26 +40,16 @@
     Iniciar sesión
   </button>
 
-  <!--<button
-    type="button"
-    class="px-4 py-2 rounded-lg font-medium transition-colors"
-    [class.bg-slate-900]="vistaActual() === 'registro'"
-    [class.text-white]="vistaActual() === 'registro'"
-    [class.text-slate-900]="vistaActual() !== 'registro'"
-    (click)="cambiarVista('registro')"
+  <!--<a
+    routerLink="/registro"
+    routerLinkActive="bg-slate-900 text-white"
+    class="px-4 py-2 rounded-lg font-medium text-slate-900 transition-colors"
   >
     Registrarse
-  </button>-->
+  </a>-->
 </nav>
 
-@switch (vistaActual()) {
-  @case ('registro') {
-    <app-registro />
-  }
-  @default {
-    <app-lista-productos />
-  }
-}
+<router-outlet />
 
 <app-footer />
 

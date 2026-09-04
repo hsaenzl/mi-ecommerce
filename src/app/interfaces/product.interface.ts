@@ -1,5 +1,5 @@
 export interface IProductoTienda {
-  id: number;
+  id: string;
   name: string;
   price: number;
   image: string;
@@ -7,7 +7,7 @@ export interface IProductoTienda {
 }
 
 export interface IProductoCarrito {
-  id: number;
+  id: string;
   name: string;
   price: number;
   amount: number;

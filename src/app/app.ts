@@ -1,25 +1,21 @@
-import { Component, signal} from '@angular/core';
-import { ListaProductos } from './components/lista-productos/lista-productos';
+import { Component, inject, signal} from '@angular/core';
 import { Footer } from './components/footer/footer';
 import { Login } from './components/login/login';
-import { Registro } from './components/registro/registro';
-
-type Vista = 'catalogo' | 'registro';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { CartService } from './services/cart-service';
 
 @Component({
   selector: 'app-root',
-  imports: [ListaProductos, Footer, Login, Registro],
+  imports: [Footer, Login, RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
 
-  vistaActual = signal<Vista>('catalogo');
-  modalLoginAbierto = signal(false);
+  private router = inject(Router);
+  cartService = inject(CartService);
 
-  cambiarVista(vista: Vista) {
-    this.vistaActual.set(vista);
-  }
+  modalLoginAbierto = signal(false);
 
   abrirModalLogin() {
     this.modalLoginAbierto.set(true);
@@ -31,7 +27,7 @@ export class App {
 
   irARegistroDesdeModal() {
     this.modalLoginAbierto.set(false);
-    this.cambiarVista('registro');
+    this.router.navigate(['/registro']);
   }
     
 }
