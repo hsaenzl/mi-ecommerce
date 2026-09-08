@@ -20,8 +20,9 @@ export class Carrito {
     }
 
     // ...lógica existente del carrito
-    alert('¡Gracias por tu compra!');
-    this.cartService.vaciar();
-    this.router.navigate(['/']);
+    //alert('¡Gracias por tu compra!');
+    //this.cartService.vaciar();
+    //this.router.navigate(['/']);
+    this.router.navigate(['/checkout']);
   }
 }

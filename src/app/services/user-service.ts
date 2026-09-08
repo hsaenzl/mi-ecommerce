@@ -7,21 +7,19 @@ import bcrypt from 'bcryptjs';
 const USERS_URL = `${environment.supabaseUrl}/users`;
 
 // Headers requeridos por Supabase (PostgREST) en cada petición.
-const SUPABASE_HEADERS = {
-    apikey: environment.supabaseKey,
-    Authorization: `Bearer ${environment.supabaseKey}`,
-    'Content-Type': 'application/json',
-    Prefer: 'return=representation',
-};
+//const SUPABASE_HEADERS = {
+//    apikey: environment.supabaseKey,
+//    Authorization: `Bearer ${environment.supabaseKey}`,
+//    'Content-Type': 'application/json',
+//    Prefer: 'return=representation',
+//};
 
 @Service()
 export class UserService {
     private http = inject(HttpClient);
 
     async loguear(email: string, contrasena: string) : Promise<boolean> {
-        const usuarios = await this.http.get<IUsers[]>(`${USERS_URL}?email=eq.${email}`, {
-            headers: SUPABASE_HEADERS
-        }).toPromise();
+        const usuarios = await this.http.get<IUsers[]>(`${USERS_URL}?email=eq.${email}`).toPromise();
 
         if (!usuarios || usuarios.length === 0) {
             return false; // Usuario no encontrado
@@ -30,9 +28,7 @@ export class UserService {
         const usuario = usuarios[0];
 
         //console.log(usuario);
-
         //const hashedPassword = await bcrypt.hash(contrasena, 10);
-
         //console.log(`"${hashedPassword}"`);
 
         const match = await bcrypt.compare(contrasena, usuario.contrasena);
@@ -41,9 +37,7 @@ export class UserService {
     }
 
     listarUsuarios() {
-        return this.http.get<IUsers[]>(USERS_URL, {
-            headers: SUPABASE_HEADERS
-        });
+        return this.http.get<IUsers[]>(USERS_URL);
     }
 
     crearUsuario(usuario: Omit<IUsers, 'id'>) {
@@ -52,15 +46,10 @@ export class UserService {
 
         console.log(usuario);
 
-        return this.http.post<IUsers>(USERS_URL, usuario, {
-            headers: SUPABASE_HEADERS
-        });
+        return this.http.post<IUsers>(USERS_URL, usuario);
     }
 
     actualizarProducto(id: string, usuario: Partial<Omit<IUsers, 'id'>>) {
-        return this.http.patch<IUsers>(`${USERS_URL}?id=eq.${id}`, usuario, {
-            headers: SUPABASE_HEADERS
-        });
+        return this.http.patch<IUsers>(`${USERS_URL}?id=eq.${id}`, usuario);
     }
-
 }

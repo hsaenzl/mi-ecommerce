@@ -25,9 +25,9 @@ export class App {
     this.modalLoginAbierto.set(false);
   }
 
-  irARegistroDesdeModal() {
-    this.modalLoginAbierto.set(false);
-    this.router.navigate(['/registro']);
-  }
+  //irARegistroDesdeModal() {
+    //this.modalLoginAbierto.set(false);
+    //this.router.navigate(['/registro']);
+  //}
     
 }

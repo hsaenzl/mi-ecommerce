@@ -7,12 +7,12 @@ import { catchError, of } from 'rxjs';
 const PRODUCTS_URL = `${environment.supabaseUrl}/product`;
 
 // Headers requeridos por Supabase (PostgREST) en cada petición.
-const SUPABASE_HEADERS = {
-    apikey: environment.supabaseKey,
-    Authorization: `Bearer ${environment.supabaseKey}`,
-    'Content-Type': 'application/json',
-    Prefer: 'return=representation',
-};
+//const SUPABASE_HEADERS = {
+//    apikey: environment.supabaseKey,
+//    Authorization: `Bearer ${environment.supabaseKey}`,
+//    'Content-Type': 'application/json',
+//    Prefer: 'return=representation',
+//};
 
 @Service()
 export class ProductService {
@@ -50,28 +50,19 @@ export class ProductService {
     }
 
     listarProductos() {
-        return this.http.get<IProductoTienda[]>(PRODUCTS_URL, {
-            headers: SUPABASE_HEADERS
-        });
+        return this.http.get<IProductoTienda[]>(PRODUCTS_URL);
     }
 
     crearProducto(producto: Omit<IProductoTienda, 'id'>) {
-        return this.http.post<IProductoTienda>(PRODUCTS_URL, producto, {
-            headers: SUPABASE_HEADERS
-        });
+        return this.http.post<IProductoTienda>(PRODUCTS_URL, producto);
     }
 
     // Supabase no distingue PUT de PATCH; filtro PostgREST: ?id=eq.<valor>.
     actualizarProducto(id: string, producto: Partial<Omit<IProductoTienda, 'id'>>) {
-        return this.http.patch<IProductoTienda>(`${PRODUCTS_URL}?id=eq.${id}`, producto, {
-            headers: SUPABASE_HEADERS
-        });
+        return this.http.patch<IProductoTienda>(`${PRODUCTS_URL}?id=eq.${id}`, producto);
     }
 
     eliminarProducto(id: string) {
-        return this.http.delete<IProductoTienda>(`${PRODUCTS_URL}?id=eq.${id}`, {
-            headers: SUPABASE_HEADERS
-        
-    });
+        return this.http.delete<IProductoTienda>(`${PRODUCTS_URL}?id=eq.${id}`);
   }
 }

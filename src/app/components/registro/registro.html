@@ -2,19 +2,22 @@
   <div class="w-full max-w-sm bg-white rounded-2xl shadow-md p-8">
     <h1 class="text-2xl font-bold text-slate-800 mb-6 text-center">Crear cuenta</h1>
 
-    <form class="space-y-4" (submit)="$event.preventDefault(); registrarse()">
+    <!--<form class="space-y-4" (submit)="$event.preventDefault(); registrarse()">-->
+    <form class="space-y-4" [formGroup]="registroForm" (ngSubmit)="registrarse()">
       <div>
         <label for="registro-nombre" class="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
         <input
           id="registro-nombre"
           type="text"
-          [value]="nombre()"
-          (input)="alEscribirNombre($event)"
+          formControlName="nombre"
           placeholder="Tu nombre completo"
           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          [class.border-red-500]="nombreInvalido()"
-          [class.border-slate-300]="!nombreInvalido()"
+          [class.border-red-500]="nombre?.invalid && nombre?.touched"
+          [class.border-slate-300]="!(nombre?.invalid && nombre?.touched)"
         />
+        @if (nombre?.invalid && nombre?.touched) {
+          <span class="text-xs text-red-600">Ingresa tu nombre.</span>
+        }
       </div>
 
       <div>
@@ -22,13 +25,15 @@
         <input
           id="registro-email"
           type="email"
-          [value]="email()"
-          (input)="alEscribirEmail($event)"
+          formControlName="email"
           placeholder="correo@ejemplo.com"
           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          [class.border-red-500]="emailInvalido()"
-          [class.border-slate-300]="!emailInvalido()"
+          [class.border-red-500]="email?.invalid && email?.touched"
+          [class.border-slate-300]="!(email?.invalid && email?.touched)"
         />
+        @if (email?.invalid && email?.touched) {
+          <span class="text-xs text-red-600">Ingresa un correo válido.</span>
+        }
       </div>
 
       <div>
@@ -36,13 +41,15 @@
         <input
           id="registro-password"
           type="password"
-          [value]="password()"
-          (input)="alEscribirPassword($event)"
+          formControlName="password"
           placeholder="••••••••"
           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          [class.border-red-500]="passwordInvalido()"
-          [class.border-slate-300]="!passwordInvalido()"
+          [class.border-red-500]="password?.invalid && password?.touched"
+          [class.border-slate-300]="!(password?.invalid && password?.touched)"
         />
+        @if (password?.invalid && password?.touched) {
+          <span class="text-xs text-red-600">Mínimo 6 caracteres.</span>
+        }
       </div>
 
       <div>
@@ -50,13 +57,17 @@
         <input
           id="registro-confirmar"
           type="password"
-          [value]="confirmarPassword()"
-          (input)="alEscribirConfirmarPassword($event)"
+          formControlName="confirmarPassword"
           placeholder="••••••••"
           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          [class.border-red-500]="confirmarPasswordInvalido()"
-          [class.border-slate-300]="!confirmarPasswordInvalido()"
+          [class.border-red-500]="(confirmarPassword?.invalid || registroForm.hasError('passwordsNoCoinciden')) && confirmarPassword?.touched"
+          [class.border-slate-300]="!((confirmarPassword?.invalid || registroForm.hasError('passwordsNoCoinciden')) && confirmarPassword?.touched)"
         />
+        @if (confirmarPassword?.invalid && confirmarPassword?.touched) {
+          <span class="text-xs text-red-600">Confirma tu contraseña.</span>
+        } @else if (registroForm.hasError('passwordsNoCoinciden') && confirmarPassword?.touched) {
+          <span class="text-xs text-red-600">Las contraseñas no coinciden.</span>
+        }
       </div>
 
       <button

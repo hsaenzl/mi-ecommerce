@@ -68,7 +68,8 @@
         ×
       </button>
 
-      <app-login (irARegistro)="irARegistroDesdeModal()" />
+      <!--<app-login (irARegistro)="irARegistroDesdeModal()" />-->
+      <app-login (irARegistro)="cerrarModalLogin()" (loginExitoso)="cerrarModalLogin()" />
     </div>
   </div>
 }
