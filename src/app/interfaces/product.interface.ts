@@ -4,6 +4,7 @@ export interface IProductoTienda {
   price: number;
   image: string;
   stock: number;
+  categorias?: string[];
 }
 
 export interface IProductoCarrito {
@@ -12,4 +13,13 @@ export interface IProductoCarrito {
   price: number;
   amount: number;
   image: string;
+}
+
+export interface FilaProductoConCategorias {
+  product_id: string;
+  product_name: string;
+  price: number;
+  stock: number;
+  image_url: string;
+  category_names: string[] | null;
 }

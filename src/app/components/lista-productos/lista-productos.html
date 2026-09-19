@@ -1,4 +1,4 @@
-@if(productService.cargando()){
+<!--@if(productService.cargando()){
   <div
   class="fixed inset-0 z-50 flex-col items-center justify-center gap-3 bg-slate-900/50 backdrop-blur-sm flex align-middle"
   >
@@ -7,7 +7,7 @@
       <p class="text-sm font-medium text-white">Cargando...</p>
     </div>
   </div>
-}
+}-->
 
 <div class="min-h-screen bg-slate-100">
   <div class="p-6 lg:p-10">
@@ -16,23 +16,60 @@
             <h1 class="text-3xl font-bold text-slate-800">🛍️ Tienda de Zapatillas</h1>
             <app-header (buscar)="alBuscar($event)" />
         </div>
-        <p class="text-slate-700 mt-4">Resultados para: <strong> {{ textoBuscado() }}</strong></p>
+        <!--<p class="text-slate-700 mt-4">Resultados para: <strong> {{ textoBuscado() }}</strong></p>-->
+        <p class="text-slate-700 mt-4">
+          Resultados para: <strong>{{ textoBuscado() || 'todos los productos' }}</strong>
+          @if (categoriaSeleccionada()) {
+            <span> en <strong>{{ categoriaSeleccionada() }}</strong></span>
+          }
+        </p>
+
+        @if (categorias().length > 0) {
+          <div class="flex flex-wrap gap-2 mt-4">
+            @for (categoria of categorias(); track categoria) {
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-full text-sm font-medium border transition-colors"
+                [class.bg-slate-900]="categoriaSeleccionada() === categoria"
+                [class.text-white]="categoriaSeleccionada() === categoria"
+                [class.border-slate-900]="categoriaSeleccionada() === categoria"
+                [class.bg-white]="categoriaSeleccionada() !== categoria"
+                [class.text-slate-700]="categoriaSeleccionada() !== categoria"
+                [class.border-slate-300]="categoriaSeleccionada() !== categoria"
+                (click)="alSeleccionarCategoria(categoria)"
+              >
+                {{ categoria }}
+              </button>
+            }
+          </div>
+        }
     </header>
 
-    @if (productService.error()) {
+    <!--@if (productService.error()) {-->
+    @if (errorBusqueda()) {
       <div class="rounded-2xl bg-red-50 border border-red-200 text-red-700 p-6 text-center">
-        <p class="font-medium">{{ productService.error() }}</p>
+        <!--<p class="font-medium">{{ productService.error() }}</p>-->
+        <p class="font-medium">{{ errorBusqueda() }}</p>
         <button
           type="button"
           class="mt-3 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors"
-          (click)="productService.cargarProductos()"
+          (click)="alBuscar(textoBuscado())"
         >
           Reintentar
         </button>
       </div>
+    } @else if (cargandoBusqueda()) {
+      <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        @for (item of totalSkeletons; track item) {
+          <app-product-card-skeleton />
+        }
+      </section>
+    } @else if (productos().length === 0) {
+      <p class="text-slate-600">No se encontraron productos.</p>
     } @else {
       <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-        @for (producto of productosFiltrados(); track producto.id) {
+        <!--@for (producto of productosFiltrados(); track producto.id) {-->
+        @for (producto of productos(); track producto.id) {
           <app-product-card
             [id]="producto.id"
             [name]="producto.name"
@@ -43,10 +80,32 @@
             (addToCart)="manejarAgregarAlCarrito($event)"
             (toggleFavorito)="manejarToggleFavorito($event)"
           />
-        } @empty {
+        } <!--@empty {
           <p class="text-slate-600">No se encontraron productos.</p>
-        }
+        }--->
       </section>
+
+      <nav class="flex items-center justify-center gap-4 mt-8" aria-label="Paginación">
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          [disabled]="paginaActual() === 1"
+          (click)="irPaginaAnterior()"
+        >
+          ← Anterior
+        </button>
+
+        <span class="text-sm text-slate-700">Página {{ paginaActual() }} de {{ totalPaginas() }}</span>
+
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          [disabled]="paginaActual() >= totalPaginas()"
+          (click)="irPaginaSiguiente()"
+        >
+          Siguiente →
+        </button>
+      </nav>
     }
 
     <section class="mt-12">
