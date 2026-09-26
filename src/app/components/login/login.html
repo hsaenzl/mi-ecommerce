@@ -46,6 +46,10 @@
       }
     </div>
 
+    @if (errorLogin()) {
+      <p class="text-sm text-red-600 text-center">{{ errorLogin() }}</p>
+    }
+
     <button
       type="submit"
       class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-medium hover:bg-slate-700 active:scale-95 transition-all duration-150"

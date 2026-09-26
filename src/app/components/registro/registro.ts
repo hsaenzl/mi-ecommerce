@@ -2,6 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { UserService } from '../../services/user-service';
 import { IUsers } from '../../interfaces/user.interface';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { AuthService } from '../../services/auth-service';
+import { Router } from '@angular/router';
 
 function passwordsIguales(): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
@@ -19,6 +21,11 @@ function passwordsIguales(): ValidatorFn {
 })
 export class Registro {
   private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  cargando = signal(false);
+  errorRegistro = signal<string | null>(null);
   // nombre = signal<string>('');
   // email = signal<string>('');
   // password = signal<string>('');
@@ -31,7 +38,7 @@ export class Registro {
 
   // cargando = signal(false);
 
-  userServices = inject(UserService);
+  //userServices = inject(UserService);
 
   // alEscribirNombre(evento: Event) {
   //   const input = evento.target as HTMLInputElement;
@@ -68,7 +75,7 @@ export class Registro {
   get password() { return this.registroForm.get('password'); }
   get confirmarPassword() { return this.registroForm.get('confirmarPassword'); }
 
-  async registrarse() {
+  registrarse() {
     // const nombreVacio = this.nombre().trim() === '';
     // const emailVacio = this.email().trim() === '';
     // const passwordVacio = this.password().trim() === '';
@@ -96,18 +103,39 @@ export class Registro {
       return;
     }
 
+    this.cargando.set(true);
+    this.errorRegistro.set(null);
+
+    const nombre = this.registroForm.value.nombre!;
+    const email = this.registroForm.value.email!;
+    const password = this.registroForm.value.password!;
+
+    this.authService.registrarse(email, password, nombre).subscribe({
+      next: () => {
+        this.cargando.set(false);
+        alert('Cuenta creada. Ya puedes iniciar sesión.');
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.cargando.set(false);
+        this.errorRegistro.set(
+          err?.error?.msg ?? err?.error?.error_description ?? err?.error?.error ?? 'No se pudo crear la cuenta.'
+        );
+      },
+    });
+
     // console.log('Datos de registro:', {
     //   nombre: this.nombre(),
     //   email: this.email(),
     //   password: this.password(),
     //   confirmarPassword: this.confirmarPassword(),
     // });
-    console.log('Datos de registro:', {
-      nombre: this.registroForm.value.nombre!,
-      email: this.registroForm.value.email!,
-      password: this.registroForm.value.password!,
-      confirmarPassword: this.registroForm.value.confirmarPassword,
-    });
+    // console.log('Datos de registro:', {
+    //   nombre: this.registroForm.value.nombre!,
+    //   email: this.registroForm.value.email!,
+    //   password: this.registroForm.value.password!,
+    //   confirmarPassword: this.registroForm.value.confirmarPassword,
+    // });
     
 
     // const nuevoUsuario: Omit<IUsers, 'id'> = {
@@ -116,24 +144,24 @@ export class Registro {
     //   contrasena: this.password(),
     //   tipo_usuario: 'normal'
     // };
-    const nuevoUsuario: Omit<IUsers, 'id'> = {
-      nombres: this.registroForm.value.nombre!,
-      email: this.registroForm.value.email!,
-      contrasena: this.registroForm.value.password!,
-      tipo_usuario: 'normal',
-    };
+    // const nuevoUsuario: Omit<IUsers, 'id'> = {
+    //   nombres: this.registroForm.value.nombre!,
+    //   email: this.registroForm.value.email!,
+    //   contrasena: this.registroForm.value.password!,
+    //   tipo_usuario: 'normal',
+    // };
 
-    this.userServices.crearUsuario(nuevoUsuario).subscribe({
-      next: (respuesta) => {
-        console.log('Usuario creado:', respuesta);
-        alert('Usuario creado');
-        //this.cargando.set(false);
-      },
-      error: (err) => {
-        console.error('Error al crear usuario:', err);
-        alert('Error al crear usuario');
-        //this.cargando.set(false);
-      }
-    });
+    // this.userServices.crearUsuario(nuevoUsuario).subscribe({
+    //   next: (respuesta) => {
+    //     console.log('Usuario creado:', respuesta);
+    //     alert('Usuario creado');
+    //     //this.cargando.set(false);
+    //   },
+    //   error: (err) => {
+    //     console.error('Error al crear usuario:', err);
+    //     alert('Error al crear usuario');
+    //     //this.cargando.set(false);
+    //   }
+    // });
   }
 }

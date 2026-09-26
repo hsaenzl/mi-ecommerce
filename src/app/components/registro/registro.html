@@ -70,11 +70,16 @@
         }
       </div>
 
+      @if (errorRegistro()) {
+        <p class="text-sm text-red-600 text-center">{{ errorRegistro() }}</p>
+      }
+
       <button
         type="submit"
-        class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-medium hover:bg-slate-700 active:scale-95 transition-all duration-150"
+        [disabled]="cargando()"
+        class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-medium hover:bg-slate-700 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Registrarse
+        {{ cargando() ? 'Creando cuenta...' : 'Registrarse' }}
       </button>
     </form>
   </div>

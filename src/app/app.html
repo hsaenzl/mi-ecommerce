@@ -29,16 +29,30 @@
     }
   </a>
 
-  <button
-    type="button"
-    class="px-4 py-2 rounded-lg font-medium transition-colors"
-    [class.bg-slate-900]="modalLoginAbierto()"
-    [class.text-white]="modalLoginAbierto()"
-    [class.text-slate-900]="!modalLoginAbierto()"
-    (click)="abrirModalLogin()"
-  >
-    Iniciar sesión
-  </button>
+  @if (authService.isLoggedIn()) {
+    <span class="px-4 py-2 font-medium text-slate-700">
+      Hola, {{ authService.usuario()?.nombre || authService.usuario()?.email }}
+    </span>
+
+    <button
+      type="button"
+      class="px-4 py-2 rounded-lg font-medium text-slate-900 hover:bg-slate-200 transition-colors"
+      (click)="cerrarSesion()"
+    >
+      Cerrar sesión
+    </button>
+  } @else {
+    <button
+      type="button"
+      class="px-4 py-2 rounded-lg font-medium transition-colors"
+      [class.bg-slate-900]="modalLoginAbierto()"
+      [class.text-white]="modalLoginAbierto()"
+      [class.text-slate-900]="!modalLoginAbierto()"
+      (click)="abrirModalLogin()"
+    >
+      Iniciar sesión
+    </button>
+  }
 
   <!--<a
     routerLink="/registro"

@@ -13,15 +13,17 @@ import { IUsers } from '../../interfaces/user.interface';
 })
 export class Login {
   private fb = inject(FormBuilder);
-  private userService = inject(UserService);
+  //private userService = inject(UserService);
   private authService = inject(AuthService);
   private router = inject(Router);
 
   //email = signal<string>('');
   //password = signal<string>('');
   cargando = signal(false);
+  errorLogin = signal<string | null>(null);
 
   irARegistro = output<void>();
+  loginExitoso = output<void>();
 
   //userService = inject(UserService);
 
@@ -34,7 +36,7 @@ export class Login {
   get password() { return this.loginForm.get('password'); }
 
   //irARegistro = output<void>();
-  loginExitoso = output<void>();
+  //loginExitoso = output<void>();
 
   // alEscribirEmail(evento: Event) {
   //   const input = evento.target as HTMLInputElement;
@@ -46,7 +48,7 @@ export class Login {
   //   this.password.set(input.value);
   // }
 
-  async iniciarSesion() {
+  iniciarSesion() {
     // this.cargando.set(true);
 
     // const emailVacio = this.email().trim() === '';
@@ -68,39 +70,54 @@ export class Login {
     }
 
     this.cargando.set(true);
+    this.errorLogin.set(null);
 
     const email = this.loginForm.value.email!;
     const password = this.loginForm.value.password!;
 
-    try {
+    this.authService.login(email, password).subscribe({
+      next: () => {
+        this.cargando.set(false);
+        this.loginExitoso.emit();
+        this.router.navigate(['/checkout']);
+      },
+      error: (err) => {
+        this.cargando.set(false);
+        this.errorLogin.set(
+          err?.error?.error_description ?? err?.error?.msg ?? 'Correo o contraseña inválidos.'
+        );
+      },
+    });
+
+    //try {
       // const validacionCorrecta = await this.userService.loguear(
       //   this.email(),
       //   this.password()
       // );
-      const validacionCorrecta = await this.userService.loguear(email, password);
+      //const validacionCorrecta = await this.userService.loguear(email, password);
 
-      this.cargando.set(false);
+      //this.cargando.set(false);
 
-      if (!validacionCorrecta) {
-        alert('Usuario o contraseña inválidos.');
-        return;
-      } else {
-        alert('Bienvenido al módulo de compras.');
-      }
+    //   if (!validacionCorrecta) {
+    //     alert('Usuario o contraseña inválidos.');
+    //     return;
+    //   } else {
+    //     alert('Bienvenido al módulo de compras.');
+    //   }
 
-      const usuario: Omit<IUsers, 'id' | 'nombres' |'tipo_usuario'> = {
-        email: this.loginForm.value.email!,
-        contrasena: this.loginForm.value.password!
-      }
+    //   const usuario: Omit<IUsers, 'id' | 'nombres' |'tipo_usuario'> = {
+    //     email: this.loginForm.value.email!,
+    //     contrasena: this.loginForm.value.password!
+    //   }
 
-      this.authService.login(usuario);
-      this.loginExitoso.emit();
-      this.router.navigate(['/checkout']);
-    } catch (error) {
-      this.cargando.set(false);
-      console.error('Error en login:', error);
-      alert('Ocurrió un error al iniciar sesión.');
-    }
+    //   this.authService.login(usuario);
+    //   this.loginExitoso.emit();
+    //   this.router.navigate(['/checkout']);
+    // } catch (error) {
+    //   this.cargando.set(false);
+    //   console.error('Error en login:', error);
+    //   alert('Ocurrió un error al iniciar sesión.');
+    // }
   }
 
   onClick() {

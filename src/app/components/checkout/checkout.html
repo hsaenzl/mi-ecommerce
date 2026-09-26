@@ -8,12 +8,24 @@
         <span class="font-medium text-black">{{ cartService.cantidadDeItems() }}</span>
       </div>
       <div class="flex justify-between text-sm text-slate-700">
+        <span>Subtotal</span>
+        <span class="font-medium text-black">{{ cartService.subtotal() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+      </div>
+      @if (cartService.descuento() > 0) {
+        <div class="flex justify-between text-sm text-emerald-600">
+          <span>Descuento</span>
+          <span class="font-medium">-{{ cartService.descuento() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+        </div>
+      }
+      <div class="flex justify-between text-sm text-slate-700">
         <span>Total a pagar</span>
-        <span class="font-semibold text-black">{{ cartService.precioTotal() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+        <span class="font-semibold text-black">{{ cartService.total() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
       </div>
     </div>
 
-    <form class="space-y-4" [formGroup]="checkoutForm" (ngSubmit)="confirmarPedido()">
+    <form class="space-y-6" [formGroup]="checkoutForm" (ngSubmit)="confirmarPedido()">
+      <div formGroupName="envio" class="space-y-4">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Datos de envío</h2>
       <div>
         <label for="checkout-nombre" class="block text-sm font-medium text-slate-700 mb-1">Nombre completo</label>
         <input
@@ -46,45 +58,125 @@
         }
       </div>
 
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label for="checkout-tarjeta" class="block text-sm font-medium text-slate-700 mb-1">Número de tarjeta</label>
+      <div class="flex items-center gap-2">
           <input
-            id="checkout-tarjeta"
-            type="text"
-            inputmode="numeric"
-            formControlName="numeroTarjeta"
-            placeholder="16 dígitos"
-            class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            [class.border-red-500]="numeroTarjeta?.invalid && numeroTarjeta?.touched"
-            [class.border-slate-300]="!(numeroTarjeta?.invalid && numeroTarjeta?.touched)"
+            id="checkout-usar-otra-direccion"
+            type="checkbox"
+            formControlName="usarOtraDireccion"
+            class="w-4 h-4"
           />
-          @if (numeroTarjeta?.invalid && numeroTarjeta?.touched) {
-            <span class="text-xs text-red-600">Debe tener 16 dígitos.</span>
-          }
+          <label for="checkout-usar-otra-direccion" class="text-sm text-slate-700">Enviar a otra dirección</label>
+        </div>
+
+        @if (usarOtraDireccion?.value) {
+          <div>
+            <label for="checkout-direccion-alt" class="block text-sm font-medium text-slate-700 mb-1">Dirección alternativa</label>
+            <input
+              id="checkout-direccion-alt"
+              type="text"
+              formControlName="direccionAlternativa"
+              placeholder="Dirección de entrega alternativa"
+              class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+          </div>
+        }
+      </div>
+
+      <div formGroupName="pago" class="space-y-4">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Datos de pago</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="checkout-tarjeta" class="block text-sm font-medium text-slate-700 mb-1">Número de tarjeta</label>
+            <input
+              id="checkout-tarjeta"
+              type="text"
+              inputmode="numeric"
+              formControlName="numeroTarjeta"
+              placeholder="16 dígitos"
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              [class.border-red-500]="numeroTarjeta?.invalid && numeroTarjeta?.touched"
+              [class.border-slate-300]="!(numeroTarjeta?.invalid && numeroTarjeta?.touched)"
+            />
+            @if (numeroTarjeta?.invalid && numeroTarjeta?.touched) {
+              <span class="text-xs text-red-600">Debe tener 16 dígitos.</span>
+            }
+          </div>
+
+          <div>
+            <label for="checkout-cvv" class="block text-sm font-medium text-slate-700 mb-1">CVV</label>
+            <input
+              id="checkout-cvv"
+              type="text"
+              inputmode="numeric"
+              formControlName="cvv"
+              placeholder="123"
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              [class.border-red-500]="cvv?.invalid && cvv?.touched"
+              [class.border-slate-300]="!(cvv?.invalid && cvv?.touched)"
+            />
+            @if (cvv?.invalid && cvv?.touched) {
+              <span class="text-xs text-red-600">Debe tener 3 dígitos.</span>
+            }
+          </div>
         </div>
 
         <div>
-          <label for="checkout-cvv" class="block text-sm font-medium text-slate-700 mb-1">CVV</label>
+          <label for="checkout-monto" class="block text-sm font-medium text-slate-700 mb-1">Monto a pagar</label>
           <input
-            id="checkout-cvv"
-            type="text"
-            inputmode="numeric"
-            formControlName="cvv"
-            placeholder="123"
+            id="checkout-monto"
+            type="number"
+            step="0.01"
+            formControlName="montoIngresado"
             class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            [class.border-red-500]="cvv?.invalid && cvv?.touched"
-            [class.border-slate-300]="!(cvv?.invalid && cvv?.touched)"
+            [class.border-red-500]="pago.hasError('montoNoCoincide') && montoIngresado?.touched"
+            [class.border-slate-300]="!(pago.hasError('montoNoCoincide') && montoIngresado?.touched)"
           />
-          @if (cvv?.invalid && cvv?.touched) {
-            <span class="text-xs text-red-600">Debe tener 3 dígitos.</span>
+          @if (pago.hasError('montoNoCoincide') && montoIngresado?.touched) {
+            <span class="text-xs text-red-600">
+              El monto ingresado no coincide con el total del carrito ({{ cartService.total() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}).
+            </span>
           }
         </div>
       </div>
 
+      <div formArrayName="items" class="space-y-3">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Cantidades a confirmar</h2>
+
+        @for (item of items.controls; track item.value.id; let i = $index) {
+          <div [formGroupName]="i" class="flex items-center gap-3 bg-slate-100 rounded-xl p-3">
+            <span class="flex-1 text-sm text-slate-800">{{ item.value.name }}</span>
+
+            <input
+              type="number"
+              min="1"
+              formControlName="cantidad"
+              class="w-20 border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              [class.border-red-500]="item.invalid && item.get('cantidad')?.touched"
+              [class.border-slate-300]="!(item.invalid && item.get('cantidad')?.touched)"
+            />
+
+            @if (item.pending) {
+              <span class="text-xs text-slate-500">Verificando stock...</span>
+            } @else if (item.get('cantidad')?.hasError('stockInsuficiente')) {
+              <span class="text-xs text-red-600">
+                Solo hay {{ item.get('cantidad')?.getError('stockInsuficiente').disponible }} en stock.
+              </span>
+            } @else if (item.get('cantidad')?.invalid && item.get('cantidad')?.touched) {
+              <span class="text-xs text-red-600">Cantidad inválida.</span>
+            }
+          </div>
+        }
+      </div>
+
+      @if (checkoutForm.pending) {
+        <p class="text-sm text-slate-500 text-center">Verificando stock...</p>
+      }
+
+
       <button
         type="submit"
-        class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-medium hover:bg-slate-700 active:scale-95 transition-all duration-150"
+        [disabled]="checkoutForm.invalid || checkoutForm.pending"
+        class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-medium hover:bg-slate-700 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Confirmar pedido
       </button>

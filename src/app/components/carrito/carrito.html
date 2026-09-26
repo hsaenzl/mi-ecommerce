@@ -11,6 +11,20 @@
             </span>
         </div>
 
+        @if (cartService.mensaje()) {
+            <div class="mb-4 rounded-lg bg-amber-100 text-amber-800 text-sm px-3 py-2 flex items-center justify-between gap-3">
+                <span>{{ cartService.mensaje() }}</span>
+                <button
+                    type="button"
+                    class="text-amber-800 font-bold"
+                    aria-label="Cerrar"
+                    (click)="cartService.mensaje.set(null)"
+                >
+                    ×
+                </button>
+            </div>
+        }
+
         <div class="space-y-3 mb-6">
             @for (productoCarrito of cartService.elementosCarrito(); track productoCarrito.id) {
                 <div class="flex items-center gap-3 bg-slate-100 rounded-xl p-3">
@@ -25,7 +39,38 @@
                         <p class="text-xs text-slate-600"> {{ productoCarrito.price | currency:'PEN':'symbol':'1.2-2':'es-PE' }} x {{ productoCarrito.amount }}</p>
                     </div>
 
-                    <span class="text-sm font-semibold text-slate-900"> {{ productoCarrito.price * productoCarrito.amount | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+                    <div class="flex items-center gap-2">
+                        <button
+                            type="button"
+                            class="w-7 h-7 rounded-full border border-slate-300 text-slate-700 font-bold hover:bg-slate-200"
+                            (click)="decrementar(productoCarrito.id, productoCarrito.amount)"
+                            aria-label="Disminuir cantidad"
+                        >
+                            -
+                        </button>
+
+                        <span class="w-6 text-center text-sm font-medium text-black">{{ productoCarrito.amount }}</span>
+
+                        <button
+                            type="button"
+                            class="w-7 h-7 rounded-full border border-slate-300 text-slate-700 font-bold hover:bg-slate-200"
+                            (click)="incrementar(productoCarrito.id, productoCarrito.amount)"
+                            aria-label="Aumentar cantidad"
+                        >
+                            +
+                        </button>
+
+                    </div>
+
+                    <span class="text-sm font-semibold text-slate-900 w-24 text-right"> {{ productoCarrito.price * productoCarrito.amount | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+
+                    <button
+                        type="button"
+                        class="text-xs text-red-600 hover:underline"
+                        (click)="eliminar(productoCarrito.id)"
+                    >
+                        Quitar
+                    </button>
 
                 </div>
             } @empty {
@@ -40,8 +85,20 @@
             </div>
 
             <div class="flex justify-between text-sm text-slate-700">
+                <span>Subtotal</span>
+                <span class="font-medium text-black">{{ cartService.subtotal() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+            </div>
+
+            @if (cartService.descuento() > 0) {
+                <div class="flex justify-between text-sm text-emerald-600">
+                    <span>Descuento</span>
+                    <span class="font-medium">-{{ cartService.descuento() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+                </div>
+            }
+
+            <div class="flex justify-between text-sm text-slate-700">
                 <span>Total a pagar</span>
-                <span class="font-semibold text-black">{{ cartService.precioTotal() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
+                <span class="font-semibold text-black">{{ cartService.total() | currency:'PEN':'symbol':'1.2-2':'es-PE' }}</span>
             </div>
         </div>
 

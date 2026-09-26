@@ -68,6 +68,12 @@ export class ProductService {
         return this.http.delete<IProductoTienda>(`${PRODUCTS_URL}?id=eq.${id}`);
     }
 
+    consultarStock(id: string) {
+        return this.http
+            .get<{ stock: number }[]>(`${PRODUCTS_URL}?id=eq.${id}&select=stock`)
+            .pipe(map((filas) => filas[0]?.stock ?? 0));
+    }
+
     buscarProductos(
         texto: string,
         categoria: string,
